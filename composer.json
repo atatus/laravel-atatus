@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Atatus PHP Middleware for Laravel",
     "keywords": ["Atatus", "APM","Analytics","Debugging","Laravel","API","Middleware"],
-    "homepage": "https:///www.atatus.com",
+    "homepage": "https://www.atatus.com",
     "license": "Apache-2.0",
     "authors": [
         {
