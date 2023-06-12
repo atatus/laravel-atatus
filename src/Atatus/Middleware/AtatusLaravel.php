@@ -108,6 +108,9 @@ class AtatusLaravel
             if ($debug) {
               Log::info('[Atatus] : skip function returned true, so skipping this event.');
             }
+            // if (extension_loaded('atatus')) {
+            //     atatus_ignore_analytics_event();
+            // }
             return $response;
           }
         }
@@ -115,6 +118,7 @@ class AtatusLaravel
         $requestData = [];
         $responseData = [];
 
+        // Request Headers
         // $requestHeaders = [];
         // foreach($request->headers->keys() as $key) {
         //     $requestHeaders[$key] = (string) $request->headers->get($key);
@@ -128,28 +132,16 @@ class AtatusLaravel
         //     $requestData['headers'] = $requestHeaders;
         // }
 
-        $requestContent = $request->getContent();
-        if($logBody && !is_null($requestContent)) {
-            $requestBody = json_decode($requestContent, true);
-
-            // Log::info('request body is json - ' . $requestBody);
-            if (is_null($requestBody) || $this->IsInValidJsonBody($requestBody) === 1) {
-                $requestData['body'] = $requestContent;
-            } else {
-                if (is_callable($maskRequestBody)) {
-                    $requestBody = $maskResponseBody($requestBody);
-                    $requestData['body'] = json_encode($requestBody);
-                } else {
-                    $requestData['body'] = $requestContent;
-                }
-            }
-        }
-
-
+        // Response Headers
         $responseHeaders = [];
         foreach($response->headers->keys() as $key) {
             $responseHeaders[$key] = (string) $response->headers->get($key);
         }
+
+        $isAllowedContentType = array_key_exists('content-type', $responseHeaders) &&
+                                $responseHeaders['content-type'] &&
+                                (str_contains($responseHeaders['content-type'], 'text/plain') ||
+                                 str_contains($responseHeaders['content-type'], 'application/json'));
 
         // if(is_callable($maskResponseHeaders)) {
         //     $responseData['headers'] = $maskResponseHeaders($responseHeaders);
@@ -157,22 +149,40 @@ class AtatusLaravel
         //     $responseData['headers'] = $responseHeaders;
         // }
 
-        $isTextHTMLContentType = array_key_exists('content-type', $responseHeaders) &&
-                                 $responseHeaders['content-type'] &&
-                                 str_contains($responseHeaders['content-type'], 'text/html');
+        if($logBody) {
 
-        $responseContent = $response->getContent();
-        if ($logBody && !$isTextHTMLContentType && !is_null($responseContent)) {
-            $jsonBody = json_decode($responseContent, true);
+            // Request Body
+            $requestContent = $request->getContent();
+            if(!is_null($requestContent)) {
+                $requestBody = json_decode($requestContent, true);
 
-            if(is_null($jsonBody) || $this->IsInValidJsonBody($jsonBody) === 1) {
-                $responseData['body'] = $responseContent;
-            } else {
-                if (is_callable($maskResponseBody)) {
-                    $jsonBody = $maskResponseBody($jsonBody);
-                    $responseData['body'] = json_encode($jsonBody);
+                // Log::info('request body is json - ' . $requestBody);
+                if (is_null($requestBody) || $this->IsInValidJsonBody($requestBody) === 1) {
+                    $requestData['body'] = $requestContent;
                 } else {
+                    if (is_callable($maskRequestBody)) {
+                        $requestBody = $maskResponseBody($requestBody);
+                        $requestData['body'] = json_encode($requestBody);
+                    } else {
+                        $requestData['body'] = $requestContent;
+                    }
+                }
+            }
+
+            // Response Body
+            $responseContent = $response->getContent();
+            if (!$isAllowedContentType && !is_null($responseContent)) {
+                $jsonBody = json_decode($responseContent, true);
+
+                if(is_null($jsonBody) || $this->IsInValidJsonBody($jsonBody) === 1) {
                     $responseData['body'] = $responseContent;
+                } else {
+                    if (is_callable($maskResponseBody)) {
+                        $jsonBody = $maskResponseBody($jsonBody);
+                        $responseData['body'] = json_encode($jsonBody);
+                    } else {
+                        $responseData['body'] = $responseContent;
+                    }
                 }
             }
         }
