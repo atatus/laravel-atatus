@@ -161,7 +161,7 @@ class AtatusLaravel
                     $requestData['body'] = $requestContent;
                 } else {
                     if (is_callable($maskRequestBody)) {
-                        $requestBody = $maskResponseBody($requestBody);
+                        $requestBody = $maskRequestBody($requestBody);
                         $requestData['body'] = json_encode($requestBody);
                     } else {
                         $requestData['body'] = $requestContent;
