@@ -171,7 +171,7 @@ class AtatusLaravel
 
             // Response Body
             $responseContent = $response->getContent();
-            if (!$isAllowedContentType && !is_null($responseContent)) {
+            if ($isAllowedContentType && !is_null($responseContent)) {
                 $jsonBody = json_decode($responseContent, true);
 
                 if(is_null($jsonBody) || $this->IsInValidJsonBody($jsonBody) === 1) {
