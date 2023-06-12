@@ -82,6 +82,8 @@ Edit `config/atatus.php` file.
 
 return [
     'logBody' => true,
+    // 'debug' => false,
+    // 'configClass' => 'MyApp\\MyConfigs\\CustomAtatusConfig'
 ];
 ```
 
@@ -91,15 +93,15 @@ For other configuration options, see below.
 
 You can define Atatus configuration options in the `config/atatus.php` file.
 
-#### __`debug`__
-Type: `Boolean`
-Optional, If true, will print debug messages using Illuminate\Support\Facades\Log
-
 #### __`logBody`__
 Type: `Boolean`
 Optional, Default true, Set to false to remove logging request and response body to Atatus.
 
-### __`configClass`__
+#### __`debug`__
+Type: `Boolean`
+Optional, Default false, Set to true to print debug messages using Illuminate\Support\Facades\Log
+
+#### __`configClass`__
 Type: `String`
 Optional, a string for the full path (including namespaces) to a class containing additional functions.
 The class can reside in any namespace, as long as the full namespace is provided.
@@ -108,13 +110,13 @@ example:
 
 ```php
 return [
-    ...
-    'configClass' => 'MyApp\\MyConfigs\\CustomAtatusConfig',
-    ...
+    'logBody' => true,
+    'debug' => false,
+    'configClass' => 'MyApp\\MyConfigs\\CustomAtatusConfig'
 ];
 ```
 
-## Configuration class
+## Configuration class **(Optional)**
 
 Because configuration hooks and functions cannot be placed in the `config/atatus.php` file, these reside in a PHP class that you create.
 Set the path to this class using the `configClass` option. You can define any of the following hooks:
@@ -174,8 +176,9 @@ class CustomAtatusConfig
 ```php
 
 return [
-  'logBody' => true,
-  'configClass' => 'MyApp\\MyConfigs\\CustomAtatusConfig',
+    'logBody' => true,
+    'debug' => false,
+    'configClass' => 'MyApp\\MyConfigs\\CustomAtatusConfig'
 ]
 
 ```
