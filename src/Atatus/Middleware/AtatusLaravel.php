@@ -73,7 +73,7 @@ class AtatusLaravel
         $response = $next($request);
 
         // after response.
-
+        $maxBodySize = 20480;
         $configClass = config('atatus.configClass');
 
         $maskRequestHeaders = null;
