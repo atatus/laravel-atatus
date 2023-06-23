@@ -52,6 +52,16 @@ class AtatusLaravel
     }
 
     /**
+     * Function for truncating string to max size.
+     */
+    function TruncateString($str, $maxBodySize) {
+        if (!is_null($str) && is_string($str)) {
+            $str = (strlen($str) > $maxBodySize) ? substr($str, 0, $maxBodySize) . '...(TRUNCATED)' : $str;
+        }
+        return $str;
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -167,6 +177,11 @@ class AtatusLaravel
                         $requestData['body'] = $requestContent;
                     }
                 }
+
+                if (array_key_exists('body', $requestData)) {
+                    $requestData['body'] = $this->TruncateString($requestData['body'], $maxBodySize);
+                }
+
             }
 
             // Response Body
@@ -174,7 +189,7 @@ class AtatusLaravel
             if ($isAllowedContentType && !is_null($responseContent)) {
                 $jsonBody = json_decode($responseContent, true);
 
-                if(is_null($jsonBody) || $this->IsInValidJsonBody($jsonBody) === 1) {
+                if (is_null($jsonBody) || $this->IsInValidJsonBody($jsonBody) === 1) {
                     $responseData['body'] = $responseContent;
                 } else {
                     if (is_callable($maskResponseBody)) {
@@ -184,6 +199,11 @@ class AtatusLaravel
                         $responseData['body'] = $responseContent;
                     }
                 }
+
+                if (array_key_exists('body', $responseData)) {
+                    $responseData['body'] = $this->TruncateString($responseData['body'], $maxBodySize);
+                }
+
             }
         }
 
